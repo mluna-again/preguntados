@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/mluna-again/pregunta2/admin"
 	"github.com/mluna-again/pregunta2/models"
 )
 
@@ -21,19 +21,7 @@ func main() {
 
 	db := models.New(dbpool)
 
-	router.GET("/questions", func(ctx *gin.Context) {
-		questions, err := db.GetQuestions(ctx)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"questions": questions,
-		})
-	})
+	admin.Setup(router, db)
 
 	router.Run()
 	log.Println("Hello new world!")
