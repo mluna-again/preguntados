@@ -34,6 +34,12 @@ func create(ctx *gin.Context) {
 		return
 	}
 
+	errors, hasErrors := validateQuestion(data)
+	if hasErrors {
+		ctx.JSON(http.StatusUnprocessableEntity, errors)
+		return
+	}
+
 	data, err = createQuestion(ctx, data)
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)

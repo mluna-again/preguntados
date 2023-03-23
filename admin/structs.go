@@ -6,6 +6,13 @@ import (
 	"github.com/mluna-again/pregunta2/models"
 )
 
+type QuestionErrors struct {
+	Body string `json:"body,omitempty"`
+	Answers []AnswerErrors `json:"answers,omitempty"`
+	AnswersCount string `json:"answers_count,omitempty"`
+	MoreThanOneCorrect string `json:"more_than_one_correct,omitempty"`
+}
+
 type QuestionData struct {
 	ID   int64    `json:"id"`
 	Body string `json:"body"`
@@ -19,6 +26,10 @@ func (q *QuestionData) fromQuestion(question models.Question) {
 	q.Body = question.Body
 	q.CreatedAt = question.CreatedAt.Time
 	q.UpdatedAt = question.UpdatedAt.Time
+}
+
+type AnswerErrors struct {
+	Body string `json:"body,omitempty"`
 }
 
 type AnswerData struct {
