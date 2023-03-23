@@ -13,17 +13,24 @@ func validateQuestionForCreate(q QuestionData) (QuestionErrors, bool) {
 		hasErrors = true
 	}
 
-	for _, a := range q.Answers {
+	ansErrCount := 0
+	errors.Answers = make([]AnswerErrors, 4)
+	for i, a := range q.Answers {
 		answerErrors, hasAnswerErrors := validateAnswer(a)
 		if hasAnswerErrors {
-			errors.Answers = append(errors.Answers, answerErrors)
+			errors.Answers[i] = answerErrors
 			hasErrors = true
+			ansErrCount++
 		}
 	}
 
 	if !onlyOneCorrectAnswer(q.Answers) {
 		errors.MoreThanOneCorrect = "Must have (only) one correct answer"
 		hasErrors = true
+	}
+
+	if ansErrCount == 0 {
+		errors.Answers = nil
 	}
 
 	return errors, hasErrors
@@ -64,8 +71,13 @@ func validateQuestionForUpdate(q QuestionData) (QuestionErrors, bool) {
 		valid = false
 	}
 
+	if errors.Answers == nil {
+		errors.Answers = make([]AnswerErrors, 4)
+	}
+	ansErrCount := 0
 	for i, a := range q.Answers {
 		if a.QuestionID == 0 {
+			ansErrCount++
 			errors.Answers[i].ID = "no id"
 			valid = false
 		}
@@ -74,6 +86,10 @@ func validateQuestionForUpdate(q QuestionData) (QuestionErrors, bool) {
 			valid = false
 			errors.DifferentQuestionIDs = "not all answers have the same question_id"
 		}
+	}
+
+	if ansErrCount == 0 {
+		errors.Answers = nil
 	}
 
 	return errors, !valid
