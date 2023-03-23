@@ -2,6 +2,8 @@ package admin
 
 import (
 	"context"
+
+	"github.com/mluna-again/pregunta2/models"
 )
 
 func allQuestions(ctx context.Context) ([]QuestionData, error) {
@@ -47,3 +49,40 @@ func withAnswers(ctx context.Context, qd []QuestionData) ([]QuestionData, error)
 
 	return qd, nil
 }
+
+func createQuestion(ctx context.Context, q QuestionData) (QuestionData, error) {
+	var question QuestionData
+
+	tx, err := dbPool.Begin(ctx)
+	if err != nil {
+		return question, err
+	}
+
+	defer tx.Rollback(ctx)
+
+	qtx := db.WithTx(tx)
+	row, err := qtx.InsertQuestion(ctx, q.Body)
+	if err != nil {
+		return question, nil
+	}
+
+	question.fromQuestion(row)
+
+	var answers []models.InsertAnswersParams
+	for _, a := range q.Answers {
+		ans := models.InsertAnswersParams{
+			Body: a.Body,
+			QuestionID: row.ID,
+			IsCorrect: a.IsCorrect,
+		}
+		answers = append(answers, ans)
+	}
+	
+	_, err = qtx.InsertAnswers(ctx, answers)
+	if err != nil {
+		return question, err
+	}
+
+	return question, nil
+}
+

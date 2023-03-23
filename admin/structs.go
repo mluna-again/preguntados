@@ -25,6 +25,7 @@ type AnswerData struct {
 	ID   int64    `json:"id"`
 	QuestionID int64 `json:"question_id"`
 	Body string `json:"body"`
+	IsCorrect bool `json:"is_correct"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

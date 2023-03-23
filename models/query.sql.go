@@ -41,6 +41,22 @@ func (q *Queries) GetAnswers(ctx context.Context, ids []int64) ([]Answer, error)
 	return items, nil
 }
 
+const getQuestionById = `-- name: GetQuestionById :one
+SELECT id, body, created_at, updated_at FROM questions WHERE id = $1
+`
+
+func (q *Queries) GetQuestionById(ctx context.Context, id int64) (Question, error) {
+	row := q.db.QueryRow(ctx, getQuestionById, id)
+	var i Question
+	err := row.Scan(
+		&i.ID,
+		&i.Body,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getQuestions = `-- name: GetQuestions :many
 SELECT id, body, created_at, updated_at FROM questions
 `
@@ -68,4 +84,26 @@ func (q *Queries) GetQuestions(ctx context.Context) ([]Question, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+type InsertAnswersParams struct {
+	Body       string
+	QuestionID int64
+	IsCorrect  bool
+}
+
+const insertQuestion = `-- name: InsertQuestion :one
+INSERT INTO questions (body) VALUES ($1) RETURNING id, body, created_at, updated_at
+`
+
+func (q *Queries) InsertQuestion(ctx context.Context, body string) (Question, error) {
+	row := q.db.QueryRow(ctx, insertQuestion, body)
+	var i Question
+	err := row.Scan(
+		&i.ID,
+		&i.Body,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

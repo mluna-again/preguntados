@@ -21,7 +21,7 @@ func main() {
 
 	db := models.New(dbpool)
 
-	admin.Setup(router, db)
+	admin.Setup(router, db, dbpool)
 
 	router.Run()
 	log.Println("Hello new world!")
