@@ -2,6 +2,5 @@
 SELECT * FROM questions;
 
 -- name: GetAnswers :many
-SELECT * FROM answers WHERE question_id = $1
-ORDER BY created_at DESC
-LIMIT 4;
+SELECT * FROM answers WHERE question_id = ANY(@ids::bigint[])
+ORDER BY created_at DESC;

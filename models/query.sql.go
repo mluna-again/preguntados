@@ -10,13 +10,12 @@ import (
 )
 
 const getAnswers = `-- name: GetAnswers :many
-SELECT id, question_id, body, is_correct, created_at, updated_at FROM answers WHERE question_id = $1
+SELECT id, question_id, body, is_correct, created_at, updated_at FROM answers WHERE question_id = ANY($1::bigint[])
 ORDER BY created_at DESC
-LIMIT 4
 `
 
-func (q *Queries) GetAnswers(ctx context.Context, questionID int64) ([]Answer, error) {
-	rows, err := q.db.Query(ctx, getAnswers, questionID)
+func (q *Queries) GetAnswers(ctx context.Context, ids []int64) ([]Answer, error) {
+	rows, err := q.db.Query(ctx, getAnswers, ids)
 	if err != nil {
 		return nil, err
 	}

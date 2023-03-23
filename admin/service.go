@@ -23,18 +23,26 @@ func allQuestions(ctx context.Context) ([]QuestionData, error) {
 }
 
 func withAnswers(ctx context.Context, qd []QuestionData) ([]QuestionData, error) {
+	mapppedAnswers := make(map[int64][]AnswerData)
+	var ids []int64
+	for _, q := range qd {
+		ids = append(ids, q.ID)
+	}
+
+	answers, err := db.GetAnswers(ctx, ids)
+
+	if err != nil {
+		return qd, err
+	}
+
+	for _, a := range answers {
+		ans := AnswerData{}
+		ans.fromAnswer(a)
+		mapppedAnswers[a.QuestionID] = append(mapppedAnswers[a.QuestionID], ans)
+	}
+
 	for i, q := range qd {
-		answers, err := db.GetAnswers(ctx, q.ID)
-
-		if err != nil {
-			return qd, err
-		}
-
-		for _, a := range answers {
-			var ad AnswerData
-			ad.fromAnswer(a)
-			qd[i].Answers = append(qd[i].Answers, ad)
-		}
+		qd[i].Answers = mapppedAnswers[q.ID]
 	}
 
 	return qd, nil
