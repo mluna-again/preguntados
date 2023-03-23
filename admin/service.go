@@ -92,6 +92,7 @@ func createQuestion(ctx context.Context, q QuestionData) (QuestionData, error) {
 		return question, err
 	}
 
+	tx.Commit(ctx)
 	return question, nil
 }
 
