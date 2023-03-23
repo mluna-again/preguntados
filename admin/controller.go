@@ -35,6 +35,12 @@ func create(ctx *gin.Context) {
 	}
 
 	data, err = createQuestion(ctx, data)
+	if err != nil {
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+
+	data, err = withAnswersForOne(ctx, data)
 
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)

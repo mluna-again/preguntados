@@ -50,6 +50,15 @@ func withAnswers(ctx context.Context, qd []QuestionData) ([]QuestionData, error)
 	return qd, nil
 }
 
+func withAnswersForOne(ctx context.Context, q QuestionData) (QuestionData, error) {
+	qds, err := withAnswers(ctx, []QuestionData{q})
+	if err != nil {
+		return q, err
+	}
+
+	return qds[0], nil
+}
+
 func createQuestion(ctx context.Context, q QuestionData) (QuestionData, error) {
 	var question QuestionData
 
