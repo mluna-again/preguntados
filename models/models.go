@@ -8,6 +8,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Answer struct {
+	ID         int64
+	QuestionID pgtype.Int8
+	Body       string
+	IsCorrect  bool
+	CreatedAt  pgtype.Timestamp
+	UpdatedAt  pgtype.Timestamp
+}
+
 type Question struct {
 	ID        int64
 	Body      string
