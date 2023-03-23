@@ -7,10 +7,12 @@ import (
 )
 
 type QuestionErrors struct {
+	ID string `json:"id,omitempty"`
 	Body string `json:"body,omitempty"`
 	Answers []AnswerErrors `json:"answers,omitempty"`
 	AnswersCount string `json:"answers_count,omitempty"`
 	MoreThanOneCorrect string `json:"more_than_one_correct,omitempty"`
+	DifferentQuestionIDs string `json:"different_question_ids,omitempty"`
 }
 
 type QuestionData struct {
@@ -29,6 +31,7 @@ func (q *QuestionData) fromQuestion(question models.Question) {
 }
 
 type AnswerErrors struct {
+	ID string `json:"id,omitempty"`
 	Body string `json:"body,omitempty"`
 }
 

@@ -1,6 +1,6 @@
 package admin
 
-func validateQuestion(q QuestionData) (QuestionErrors, bool) {
+func validateQuestionForCreate(q QuestionData) (QuestionErrors, bool) {
 	hasErrors := false
 	var errors QuestionErrors
 	if q.Body == "" {
@@ -49,4 +49,32 @@ func onlyOneCorrectAnswer(a []AnswerData) bool {
 	}
 
 	return count == 1
+}
+
+func validateQuestionForUpdate(q QuestionData) (QuestionErrors, bool) {
+	errors, hasErrors := validateQuestionForCreate(q)
+
+	if hasErrors {
+		return errors, true
+	}
+
+	valid := true
+	if q.ID == 0 {
+		errors.ID = "no id"
+		valid = false
+	}
+
+	for i, a := range q.Answers {
+		if a.QuestionID == 0 {
+			errors.Answers[i].ID = "no id"
+			valid = false
+		}
+
+		if a.QuestionID != q.ID {
+			valid = false
+			errors.DifferentQuestionIDs = "not all answers have the same question_id"
+		}
+	}
+
+	return errors, !valid
 }

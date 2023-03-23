@@ -13,3 +13,13 @@ INSERT INTO questions (body) VALUES ($1) RETURNING *;
 
 -- name: InsertAnswers :copyfrom
 INSERT INTO answers (body, question_id, is_correct) VALUES ($1, $2, $3);
+
+-- name: UpdateQuestion :one
+UPDATE questions SET body = $2, updated_at = now()
+WHERE id = $1
+RETURNING *;
+
+-- name: UpdateAnswerForQuestion :many
+UPDATE answers SET body = $3, is_correct = $4, updated_at = now()
+WHERE id = $1 AND question_id = $2
+RETURNING *;

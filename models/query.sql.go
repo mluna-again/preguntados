@@ -107,3 +107,71 @@ func (q *Queries) InsertQuestion(ctx context.Context, body string) (Question, er
 	)
 	return i, err
 }
+
+const updateAnswerForQuestion = `-- name: UpdateAnswerForQuestion :many
+UPDATE answers SET body = $3, is_correct = $4, updated_at = now()
+WHERE id = $1 AND question_id = $2
+RETURNING id, question_id, body, is_correct, created_at, updated_at
+`
+
+type UpdateAnswerForQuestionParams struct {
+	ID         int64
+	QuestionID int64
+	Body       string
+	IsCorrect  bool
+}
+
+func (q *Queries) UpdateAnswerForQuestion(ctx context.Context, arg UpdateAnswerForQuestionParams) ([]Answer, error) {
+	rows, err := q.db.Query(ctx, updateAnswerForQuestion,
+		arg.ID,
+		arg.QuestionID,
+		arg.Body,
+		arg.IsCorrect,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Answer
+	for rows.Next() {
+		var i Answer
+		if err := rows.Scan(
+			&i.ID,
+			&i.QuestionID,
+			&i.Body,
+			&i.IsCorrect,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateQuestion = `-- name: UpdateQuestion :one
+UPDATE questions SET body = $2, updated_at = now()
+WHERE id = $1
+RETURNING id, body, created_at, updated_at
+`
+
+type UpdateQuestionParams struct {
+	ID   int64
+	Body string
+}
+
+func (q *Queries) UpdateQuestion(ctx context.Context, arg UpdateQuestionParams) (Question, error) {
+	row := q.db.QueryRow(ctx, updateQuestion, arg.ID, arg.Body)
+	var i Question
+	err := row.Scan(
+		&i.ID,
+		&i.Body,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
