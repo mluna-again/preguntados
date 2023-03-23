@@ -10,7 +10,7 @@ import (
 
 type Answer struct {
 	ID         int64
-	QuestionID pgtype.Int8
+	QuestionID int64
 	Body       string
 	IsCorrect  bool
 	CreatedAt  pgtype.Timestamp

@@ -2,11 +2,9 @@ package admin
 
 import (
 	"context"
-
-	"github.com/mluna-again/pregunta2/models"
 )
 
-func allQuestions(ctx context.Context, db *models.Queries) ([]QuestionData, error) {
+func allQuestions(ctx context.Context) ([]QuestionData, error) {
 	var qds []QuestionData
 
 	questions, err := db.GetQuestions(ctx)
@@ -22,4 +20,22 @@ func allQuestions(ctx context.Context, db *models.Queries) ([]QuestionData, erro
 	}
 
 	return qds, nil
+}
+
+func withAnswers(ctx context.Context, qd []QuestionData) ([]QuestionData, error) {
+	for i, q := range qd {
+		answers, err := db.GetAnswers(ctx, q.ID)
+
+		if err != nil {
+			return qd, err
+		}
+
+		for _, a := range answers {
+			var ad AnswerData
+			ad.fromAnswer(a)
+			qd[i].Answers = append(qd[i].Answers, ad)
+		}
+	}
+
+	return qd, nil
 }

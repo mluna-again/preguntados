@@ -10,7 +10,9 @@ import (
 var db *models.Queries
 
 func index(ctx *gin.Context) {
-		questions, err := allQuestions(ctx, db)
+		questions, err := allQuestions(ctx)
+		questions, err = withAnswers(ctx, questions)
+
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"message": err.Error(),
